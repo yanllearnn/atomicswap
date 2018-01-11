@@ -39,10 +39,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/decred/dcrutil"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/decred/dcrwallet"
 
 [[constraint]]
@@ -79,3 +75,27 @@
 [[constraint]]
   name = "google.golang.org/grpc"
   version = "1.6.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/vertcoin/vtcd"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/vertcoin/vtcutil"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/vertcoin/vtcwallet"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/particl/partsuite_partd"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/particl/partsuite_partutil"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/particl/partsuite_partwallet"

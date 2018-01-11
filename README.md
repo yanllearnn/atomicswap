@@ -1,10 +1,15 @@
+**NOTICE Jan 10 2018:** The atomic swap contract has been updated to use SHA256
+ secret hashes (instead of RIPEMD160) as it is more secure and has wider
+ compatibility with altcoins.  Old contracts will not be usable by the new tools
+ and vice-versa.  Please rebuild all tools before conducting new atomic swaps.
+
 # Decred cross-chain atomic swapping
 
 This repo contains utilities to manually perform cross-chain atomic swaps
 between Decred and other cryptocurrencies.  At the moment, Bitcoin (Bitcoin
-Core) and Litecoin (Litecoin Core) are the two other blockchains and wallets
-supported.  Support for other blockchains or wallets could be added in the
-future.
+Core), Litecoin (Litecoin Core), Vertcoin (Vertcoin Core) and Particl (Particl Core) are the four
+other blockchains and wallets supported.  Support for other blockchains or 
+wallets could be added in the future.
 
 These tools do not operate solely on-chain.  A side-channel is required between
 each party performing the swap in order to exchange additional data.  This
@@ -15,9 +20,9 @@ and a way for early adopters to try out the technology.
 
 Due to the requirements of manually exchanging data and creating, sending, and
 watching for the relevant transactions, it is highly recommended to read this
-README in its entirety before attempting to use these tools.  The sections below
-explain the principles on which the tools operate, the instructions for how to
-use them safely, and an example swap between Decred and Bitcoin.
+README in its entirety before attempting to use these tools.  The sections 
+below explain the principles on which the tools operate, the instructions for 
+how to use them safely, and an example swap between Decred and Bitcoin.
 
 ## Build instructions
 
@@ -295,7 +300,7 @@ B now informs A that the Decred contract transaction has been created and
 published, and provides the contract details to A.
 
 Just as B needed to audit A's contract before locking their coins in a contract,
-A must do the same with B's contract before withdrawing from the contract.  B
+A must do the same with B's contract before withdrawing from the contract.  A
 audits the contract and contract transaction to verify:
 
 1. The recipient address was the DCR address that was provided to B
@@ -382,7 +387,7 @@ Several steps require working with a raw transaction published by the other
 party.  While the transactions can sometimes be looked up from a local node
 using the `getrawtransaction` JSON-RPC, this method can be unreliable since the
 set of queryable transactions depends on the current UTXO set (bitcoind,
-litecoind) or may require the transaction index to be enabled (dcrd).
+litecoind, vertcoind, particld) or may require the transaction index to be enabled (dcrd).
 
 Another method of discovering these transactions is to use a public blockchain
 explorer.  Not all explorers expose this info through the main user interface so
