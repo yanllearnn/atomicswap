@@ -83,7 +83,7 @@
   branch = "master"
   name = "github.com/viacoin/viad"
   packages = ["btcec","btcjson","chaincfg","chaincfg/chainhash","rpcclient","txscript","wire"]
-  revision = "1c0490c73d220336491f19486b21879feefff5e4"
+  revision = "a37add7df239fe89ad45630c4249977ddf0764a9"
 
 [[projects]]
   branch = "master"
