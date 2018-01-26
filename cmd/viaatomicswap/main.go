@@ -380,7 +380,7 @@ func walletPort(params *chaincfg.Params) string {
 	case &chaincfg.MainNetParams:
 		return "5222"
 	case &chaincfg.TestNet3Params:
-		return "25222"
+		return "15222"
 	default:
 		return ""
 	}

@@ -89,7 +89,7 @@
   branch = "master"
   name = "github.com/viacoin/viautil"
   packages = [".","base58","bech32"]
-  revision = "ed9ec48290bc085ae179946a14675bf2249fc718"
+  revision = "97d3792a2f4a7840ee3619fea11facef8cf7e7d7"
 
 [[projects]]
   branch = "master"

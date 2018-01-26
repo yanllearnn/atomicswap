@@ -3,11 +3,11 @@
  compatibility with altcoins.  Old contracts will not be usable by the new tools
  and vice-versa.  Please rebuild all tools before conducting new atomic swaps.
 
-# Decred cross-chain atomic swapping
+# Litecoin cross-chain atomic swapping
 
 This repo contains utilities to manually perform cross-chain atomic swaps
-between Decred and other cryptocurrencies.  At the moment, Bitcoin ([Bitcoin
-Core](https://github.com/bitcoin/bitcoin)), Litecoin ([Litecoin Core](https://github.com/litecoin-project/litecoin)), Vertcoin ([Vertcoin Core](https://github.com/vertcoin/vertcoin)) and Particl ([Particl Core](https://github.com/particl/particl-core)) are the four
+between Litecoin and other cryptocurrencies.  At the moment,Decred (Decred Core) Viacoin (Viacoin
+Core), Litecoin (Litecoin Core), Vertcoin (Vertcoin Core) and Particl (Particl Core) are the four
 other blockchains and wallets supported.  Support for other blockchains or 
 wallets could be added in the future.
 
@@ -22,7 +22,7 @@ Due to the requirements of manually exchanging data and creating, sending, and
 watching for the relevant transactions, it is highly recommended to read this
 README in its entirety before attempting to use these tools.  The sections 
 below explain the principles on which the tools operate, the instructions for 
-how to use them safely, and an example swap between Decred and Bitcoin.
+how to use them safely, and an example swap between Litecoin and Viacoin.
 
 ## Build instructions
 
@@ -30,11 +30,11 @@ Pre-requirements:
 
   - Go 1.9 or later
   - [dep](https://github.com/golang/dep)
-  - `dcrwallet` 1.1.0 or later (for `dcratomicswap`)
+  - `viacoin` 0.13 or later (for `viaatomicswap`)
 
 ```
-$ cd $GOPATH/src/github.com/decred
-$ git clone https://github.com/decred/atomicswap && cd atomicswap
+$ cd $GOPATH/src/github.com/viacoin
+$ git clone https://github.com/viacoin/atomicswap && cd atomicswap
 $ dep ensure
 $ go install ./cmd/...
 ```
@@ -42,8 +42,8 @@ $ go install ./cmd/...
 ## Theory
 
 A cross-chain swap is a trade between two users of different cryptocurrencies.
-For example, one party may send Decred to a second party's Decred address, while
-the second party would send Bitcoin to the first party's Bitcoin address.
+For example, one party may send Litecoin to a second party's Litecoin address, while
+the second party would send Viacoin to the first party's Viacoin address.
 However, as the blockchains are unrelated and transactions can not be reversed,
 this provides no protection against one of the parties never honoring their end
 of the trade.  One common solution to this problem is to introduce a
@@ -62,17 +62,17 @@ long as the secret is known.  If a period of time (typically 48 hours) expires
 after the contract transaction has been mined but has not been redeemed by the
 participant, the contract output can be refunded back to the initiator's wallet.
 
-For simplicity, we assume the initiator wishes to trade Bitcoin for Decred with
-the participant.  The initiator can also trade Decred for Bitcoin and the steps
+For simplicity, we assume the initiator wishes to trade Viacoin for Litecoin with
+the participant.  The initiator can also trade Litecoin for Viacoin and the steps
 will be the same, but with each step performed on the other blockchain.
 
-The participant is unable to spend from the initiator's Bitcoin contract at this
+The participant is unable to spend from the initiator's Viacoin contract at this
 point because the secret is unknown by them.  If the initiator revealed their
 secret at this point, the participant could spend from the contract without ever
 honoring their end of the trade.
 
 The participant creates a similar contract transaction to the initiator's but on
-the Decred blockchain and pays the intended Decred amount into the contract.
+the Litecoin blockchain and pays the intended Litecoin amount into the contract.
 However, for the initiator to redeem the output, their own secret must be
 revealed.  For the participant to create their contract, the initiator must
 reveal not the secret, but a cryptographic hash of the secret to the
@@ -82,10 +82,10 @@ required to wait before their contract can be refunded (typically 24 hours).
 
 With each side paying into a contract on each blockchain, and each party unable
 to perform their refund until the allotted time expires, the initiator redeems
-the participant's Decred contract, thereby revealing the secret to the
-participant.  The secret is then extracted from the initiator's redeeming Decred
+the participant's Litecoin contract, thereby revealing the secret to the
+participant.  The secret is then extracted from the initiator's redeeming Litecoin
 transaction providing the participant with the ability to redeem the initiator's
-Bitcoin contract.
+Viacoin contract.
 
 This procedure is atomic (with timeout) as it gives each party at least 24 hours
 to redeem their coins on the other blockchain before a refund can be performed.
@@ -99,13 +99,13 @@ transfer of data between each party.
 
 Separate command line utilities are provided to handle the transactions required
 to perform a cross-chain atomic swap for each supported blockchain.  For a swap
-between Bitcoin and Decred, the two utilities `btcatomicswap` and
-`dcratomicswap` are used.  Both tools must be used by both parties performing
+between Viacoin and Litecoin, the two utilities `viacatomicswap` and
+`ltcatomicswap` are used.  Both tools must be used by both parties performing
 the swap.
 
 Different tools may require different flags to use them with the supported
-wallet.  For example, `btcatomicswap` includes flags for the RPC username and
-password while `dcratomicswap` does not.  Running a tool without any parameters
+wallet.  For example, `viaatomicswap` includes flags for the RPC username and
+password same as for `ltcatomicswap`.  Running a tool without any parameters
 will show the full usage help.
 
 All of the tools support the same six commands.  These commands are:
@@ -134,7 +134,7 @@ The refund transaction should be saved in case a refund is required to be made
 later.
 
 For dcratomicswap, this step prompts for the wallet passphrase.  For the
-btcatomicswap and ltcatomicswap tools the wallet must already be unlocked.
+viaatomicswap and ltcatomicswap tools the wallet must already be unlocked.
 
 **`participate <initiator address> <amount> <secret hash>`**
 
@@ -149,7 +149,7 @@ The refund transaction should be saved in case a refund is required to be made
 later.
 
 For dcratomicswap, this step prompts for the wallet passphrase.  For the
-btcatomicswap and ltcatomicswap tools the wallet must already be unlocked.
+viaatomicswap and ltcatomicswap tools the wallet must already be unlocked.
 
 **`redeem <contract> <contract transaction> <secret>`**
 
@@ -163,7 +163,7 @@ Running this command will prompt for whether to publish the redemption
 transaction. If everything looks correct, the transaction should be published.
 
 For dcratomicswap, this step prompts for the wallet passphrase.  For the
-btcatomicswap and ltcatomicswap tools the wallet must already be unlocked.
+viaatomicswap and ltcatomicswap tools the wallet must already be unlocked.
 
 **`refund <contract> <contract transaction>`**
 
@@ -197,184 +197,184 @@ correct, and that the locktime is sensible.
 ## Example
 
 The first step is for both parties to exchange addresses on both blockchains. If
-party A (the initiator) wishes to trade Bitcoin for Decred, party B (the
-participant) must provide their Bitcoin address and the initiator must provide
-the participant their Decred address.
+party A (the initiator) wishes to trade Viacoin for Litecoin, party B (the
+participant) must provide their Viacoin address and the initiator must provide
+the participant their Litecoin address.
 
-_Party A runs:_
+_Alice runs:_
 ```
-$ dcrctl --testnet --wallet getnewaddress
-TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr
+$ litecoin-cli -testnet getnewaddress
+mo8T4iqg6mCAxAtZocwocisBnnCj1SjtD7
 ```
 
-_Party B runs:_
+_Bob runs:_
 ```
-$ bitcoin-cli -testnet getnewaddress
-n31og5QGuS28dmHpDH6PQD5wmVQ2K2spAG
+$ viacoin-cli -testnet getnewaddress
+tCzCYhhas9bxx5a3hNTCT6g7gmoASnkYFc
 ```
 
 *Note:* It is normal for neither of these addresses to show any activity on
 block explorers.  They are only used in nonstandard scripts that the block
 explorers do not recognize.
 
-A initiates the process by using `btcatomicswap` to pay 1.0 BTC into the Bitcoin
-contract using B's Bitcoin address, sending the contract transaction, and
+Alice initiates the process by using `viaatomicswap` to pay 1.0 VIA into the Viacoin
+contract using Bob's Viacoin address, sending the contract transaction, and
 sharing the secret hash (*not* the secret), contract, and contract transaction
-with B.  The refund transaction can not be sent until the locktime expires, but
+with Bob.  The refund transaction can not be sent until the locktime expires, but
 should be saved in case a refund is necessary.
 
-_Party A runs:_
+_Alice runs:_
 ```
-$ btcatomicswap --testnet --rpcuser=user --rpcpass=pass initiate n31og5QGuS28dmHpDH6PQD5wmVQ2K2spAG 1.0
-Secret:      3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
-Secret hash: 29c36b8dd380e0426bdc1d834e74a630bfd5d111
+$ viaatomicswap --testnet --rpcuser=viarpc --rpcpass=viapass initiate tCzCYhhas9bxx5a3hNTCT6g7gmoASnkYFc 1.0
+warning: falling back to mempool relay fee policy
+Secret:      b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c
+Secret hash: 753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b04
 
-Contract fee: 0.0000744 BTC (0.00020000 BTC/kB)
-Refund fee:   0.00000281 BTC (0.00001018 BTC/kB)
+Contract fee: 0.000224 VIA (0.00100000 VIA/kB)
+Refund fee:   0.000293 VIA (0.00101736 VIA/kB)
 
-Contract (2MwQAMPeRGdCzFzPy7DmCnQudDVGNBFJK8S):
-63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a914ebcf822c4a2cdb5f6a6b9c4a59b74d66461da5816704d728bd59b17576a91406fb26221375b1cbe2c17c14f1bc2510b9f8f8ff6888ac
+Contract (2N3WGX7fxYnsaQ7ATgt2Nzxc964A2VeCSZa):
+63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914427eccead89fd187b4b80e414c94a9cbd798bf1667046c795b5ab17576a914414e19736e7c718cdb532ad5e6f045a4d6c47b5a6888ac
 
-Contract transaction (346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88):
-010000000267864c7145e43c84d13b514518cfdc7ca5cf2b04764ed2672caa9c8f6338a3e3010000006b483045022100901602e523f25e9659951d186eec7e8b9df9d194e8013fb6d7a05e4eafdbb61602207b66e0179a42c54d4fcfca2b1ccd89d56253cc83724593187713f6befb37866201210288ef714849ce7735b64ed886d056b80d0a384ca299090f684820d31e7682825afeffffff3ac58ce49bcef3d047ea80281659a78cd7ef8537ca2bfce336abdce41450d2d7000000006b483045022100bd1246fc18d26a9cc85c14fb60655da2f2e845af906504b8ba3acbb1b0ebf08202201ec2cd5a0c94e9e6b971ec3198be0ff57e91115342cd98ccece98d8b18294d86012103406e35c37b3b85481db7b7f7807315720dd6486c25e4f3af93d5d5f21e743881feffffff0248957e01000000001976a914c1925e7398d325820bba18726c387e9d80047ef588ac00e1f5050000000017a9142d913627b881255c417787cc255ccad9a33ce48d8700000000
+Contract transaction (9d668fc6f4dfe2dca2af980e6525352d49f62682c2b8a35176b3a7fef76e0d33):
+02000000013328bf00e003539fafcaca5fa069280456ceb2ffe63a074963b8db6e85b37fef000000006b4830450221008bb37d82362c23f5f097d37e03268b1cca83f8bc445d4639e426901a6175a1c802203ce6ccc6b88d5cd999987455248e671e708f2b03afa2b8320e204fbec75bce8f0121021bdf64267e7ad297726aa529cf7e61cf8ceb67acbbc9c57ae4df546680788274feffffff0280677c48180900001976a91443306976fdfa61c447055cdb1aea3fe9a3eb3ebd88ac00e1f5050000000017a91470899c4b5ad673c87a8e0b5faf68b092c0c79a818700000000
 
-Refund transaction (45c7c175f333981508229f6fa637410fbbf4f086b657035c07adda6a49207e03):
-000000000188fee037e8275f7d1e8686886a12131933f481b48902859791d6f1df01496f3401000000bf4830450221009344b17316054eae5d293b34683177fa5e7c7ba9b0001ebb2b3deca83bef552e022067088b7342bed0155b2ccef69d97cd293faa687f589d2a351aa6e154953c0c65012103a3a9f2c0492a40b134363e82959fa6132b86e0969e0b25109beb53b1debc4324004c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a914ebcf822c4a2cdb5f6a6b9c4a59b74d66461da5816704d728bd59b17576a91406fb26221375b1cbe2c17c14f1bc2510b9f8f8ff6888ac0000000001e7dff505000000001976a914f5261c9e58aaa9461923c3f78f8f12f0eec22ed388acd728bd59
+Refund transaction (00672eb4cf97ae21ab7a9e196310b10b9abf0bdd2ae22d42843bc6a0df931355):
+0200000001330d6ef7fea7b37651a3b8c28226f6492d3525650e98afa2dce2dff4c68f669d01000000cb48304502210089212e0299baedcc3bc6e9e3ef707d50a84a9b1676e0d272a90b8906581e1db5022014ba8ae371946bdee8535fabe9a1fde201a4ab52b6613fedaeafb24958a24e330121020da7c60c0950ebb00cd7ea8223ac6b38ff61f418ddc7f775f38e76837076d51e004c5d63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914427eccead89fd187b4b80e414c94a9cbd798bf1667046c795b5ab17576a914414e19736e7c718cdb532ad5e6f045a4d6c47b5a6888ac00000000018c6ef505000000001976a91443306976fdfa61c447055cdb1aea3fe9a3eb3ebd88ac6c795b5a
 
 Publish contract transaction? [y/N] y
-Published contract transaction (346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88)
+Published contract transaction (9d668fc6f4dfe2dca2af980e6525352d49f62682c2b8a35176b3a7fef76e0d33)
 ```
 
-Once A has initialized the swap, B must audit the contract and contract
+Once Alice has initialized the swap, Bob must audit the contract and contract
 transaction to verify: 
 
-1. The recipient address was the BTC address that was provided to A
-2. The contract value is the expected amount of BTC to receive
+1. The recipient address was the VIA address that was provided to Alice
+2. The contract value is the expected amount of VIA to receive
 3. The locktime was set to 48 hours in the future
 
-_Party B runs:_
+_Bob runs:_
 ```
-$ btcatomicswap --testnet auditcontract 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a914ebcf822c4a2cdb5f6a6b9c4a59b74d66461da5816704d728bd59b17576a91406fb26221375b1cbe2c17c14f1bc2510b9f8f8ff6888ac 010000000267864c7145e43c84d13b514518cfdc7ca5cf2b04764ed2672caa9c8f6338a3e3010000006b483045022100901602e523f25e9659951d186eec7e8b9df9d194e8013fb6d7a05e4eafdbb61602207b66e0179a42c54d4fcfca2b1ccd89d56253cc83724593187713f6befb37866201210288ef714849ce7735b64ed886d056b80d0a384ca299090f684820d31e7682825afeffffff3ac58ce49bcef3d047ea80281659a78cd7ef8537ca2bfce336abdce41450d2d7000000006b483045022100bd1246fc18d26a9cc85c14fb60655da2f2e845af906504b8ba3acbb1b0ebf08202201ec2cd5a0c94e9e6b971ec3198be0ff57e91115342cd98ccece98d8b18294d86012103406e35c37b3b85481db7b7f7807315720dd6486c25e4f3af93d5d5f21e743881feffffff0248957e01000000001976a914c1925e7398d325820bba18726c387e9d80047ef588ac00e1f5050000000017a9142d913627b881255c417787cc255ccad9a33ce48d8700000000
-Contract address:        2MwQAMPeRGdCzFzPy7DmCnQudDVGNBFJK8S
-Contract value:          1 BTC
-Recipient address:       n31og5QGuS28dmHpDH6PQD5wmVQ2K2spAG
-Author's refund address: mg9sDLhfByfAWFo4zq3JZ7nsLfsN59XPue
+$ viaatomicswap --testnet --rpcuser=viarpc --rpcpass=viapass auditcontract 63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914427eccead89fd187b4b80e414c94a9cbd798bf1667046c795b5ab17576a914414e19736e7c718cdb532ad5e6f045a4d6c47b5a6888ac 02000000013328bf00e003539fafcaca5fa069280456ceb2ffe63a074963b8db6e85b37fef000000006b4830450221008bb37d82362c23f5f097d37e03268b1cca83f8bc445d4639e426901a6175a1c802203ce6ccc6b88d5cd999987455248e671e708f2b03afa2b8320e204fbec75bce8f0121021bdf64267e7ad297726aa529cf7e61cf8ceb67acbbc9c57ae4df546680788274feffffff0280677c48180900001976a91443306976fdfa61c447055cdb1aea3fe9a3eb3ebd88ac00e1f5050000000017a91470899c4b5ad673c87a8e0b5faf68b092c0c79a818700000000
+Contract address:        2N3WGX7fxYnsaQ7ATgt2Nzxc964A2VeCSZa
+Contract value:          1 VIA
+Recipient address:       tCzCYhhas9bxx5a3hNTCT6g7gmoASnkYFc
+Author's refund address: tCsuXhjMpF5Sz8j1rnr1A2ybm2KKEovQ4e
 
-Secret hash: 29c36b8dd380e0426bdc1d834e74a630bfd5d111
+Secret hash: 753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b04
 
-Locktime: 2017-09-16 13:36:23 +0000 UTC
-Locktime reached in 47h56m54s
+Locktime: 2018-01-14 15:38:20 +0000 UTC
+Locktime reached in 47h55m4s
 ```
 
 Auditing the contract also reveals the hash of the secret, which is needed for
 the next step.
 
-Once B trusts the contract, they may participate in the cross-chain atomic swap
-by paying the intended Decred amount (1.0 in this example) into a Decred
+Once Bob trusts the contract, they may participate in the cross-chain atomic swap
+by paying the intended Litecoin amount (0.1 in this example) into a Litecoin
 contract using the same secret hash.  The contract transaction may be published
 at this point.  The refund transaction can not be sent until the locktime
 expires, but should be saved in case a refund is necessary.
 
-_Party B runs:_
+_Bob runs:_
 ```
-$ dcratomicswap --testnet participate TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr 1.0 29c36b8dd380e0426bdc1d834e74a630bfd5d111
-Passphrase:
+$ ltcatomicswap --testnet --rpcuser=literpc --rpcpass=litepass participate mo8T4iqg6mCAxAtZocwocisBnnCj1SjtD7 0.1 753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b04
+Contract fee: 0.00046482 LTC (0.00208439 LTC/kB)
+Refund fee:   0.00060801 LTC (0.00211115 LTC/kB)
 
-Contract fee: 0.000251 DCR (0.00100400 DCR/kB)
-Refund fee:   0.000301 DCR (0.00100669 DCR/kB)
+Contract (2N6bnC8JPrdyuDukgvHdt2qQf8Uph6x1T2L):
+63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914537f748b77747bb63e6c54dc72cb964b88d154486704012a5a5ab17576a91416877ea36c0fc5653fcb3d0f1c423c633c95f01e6888ac
 
-Contract (TcZpybEVDVTuoE3TCBxW3ui12YEZWrw5ccS):
-63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac
+Contract transaction (95929b639cc729a1a89b3fa72e6f2de589e53c4336d52e24c982ec11ccc0529a):
+0200000001341d2139c84baca7e3ee772e43342bb5adae29ac97f7bf825d1e631ccbbdfdd8000000006a4730440220077a466948ba9b1bcd3810de53eb365a07007b444a253a9a96631ca6ea120fd6022050af903896ae33403e2c92d337bbd5f79789a526245d3a2aa033f1a060f15662012103bd3db3ee6866fa8a340128f9b38a4990786f82c3189c8c16bd828ac1b141c161feffffff02ed63f702000000001976a91441f956d3257b7b8689a51d1938599ba88e2b718788ac809698000000000017a914927cd64dcd1c89bb9a26860e7d6f49ee07f217158700000000
 
-Contract transaction (a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918):
-010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f
-
-Refund transaction (836288fa26bbce52342c8569ca4e0db7dec81b2187eb453c1fd5c5d06838f60a):
-000000000118d94f38b8532bfe78bda0d0848a7965bdfbe6e88476896f01318717bc7e1aa5010000000000000000016c6bf5050000000000001976a9140b4dae42b84dbad7b7e35f61602cb6a2393f0ae088ace6dabb590000000001ffffffffffffffff00000000ffffffffbe47304402201bd55803eae6de4ea19c618060f82c38e9ca04047c346dc7025f54d8276f13f602205cdf104db74563559e570f186cbc68549d623618b96c7ec971d1a996dab78fbd01210244e4e75a9318ac06656d145c3d3205b2f4f25615698f458e80233c4bb78c91ac004c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac
+Refund transaction (6bec919ef5bdd3ade5bed5f7444625f13a0b8b2013ce300fe9effc242139716f):
+02000000019a52c0cc11ec82c9242ed536433ce589e52d6f2ea73f9ba8a129c79c639b929501000000cb48304502210099fa0e782c7b605789a8fc0f1717a0ae2216c17834b144e571dee23a1c399db0022076deb568476ae0bf1fccbd268459cf52f0e990ddc5ab55eacecd4275e82bc811012103854514be427b60622ec714c707fa6dc5b432bd457d0763d5b5495fd92175077e004c5d63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914537f748b77747bb63e6c54dc72cb964b88d154486704012a5a5ab17576a91416877ea36c0fc5653fcb3d0f1c423c633c95f01e6888ac0000000001ffa89700000000001976a914e37f21a2edfaa0a5917618928b16776cf6c22ae288ac012a5a5a
 
 Publish contract transaction? [y/N] y
-Published contract transaction (a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918)
+Published contract transaction (95929b639cc729a1a89b3fa72e6f2de589e53c4336d52e24c982ec11ccc0529a)
+
 ```
 
-B now informs A that the Decred contract transaction has been created and
-published, and provides the contract details to A.
+Bob now informs Alice that the Litecoin contract transaction has been created and
+published, and provides the contract details to Alice.
 
-Just as B needed to audit A's contract before locking their coins in a contract,
-A must do the same with B's contract before withdrawing from the contract.  A
+Just as Bob needed to audit Alice's contract before locking their coins in a contract,
+Alice must do the same with Bob's contract before withdrawing from the contract.  Alice
 audits the contract and contract transaction to verify:
 
-1. The recipient address was the DCR address that was provided to B
-2. The contract value is the expected amount of DCR to receive
+1. The recipient address was the LTC address that was provided to Bob
+2. The contract value is the expected amount of LTC to receive
 3. The locktime was set to 24 hours in the future
 4. The secret hash matches the value previously known
 
-_Party A runs:_
+_Alice runs:_
 ```
-$ dcratomicswap --testnet auditcontract 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f
-Contract address:        TcZpybEVDVTuoE3TCBxW3ui12YEZWrw5ccS
-Contract value:          1 DCR
-Recipient address:       TsfWDVTAcsLaHUhHnLLKkGnZuJz2vkmM6Vr
-Author's refund address: Tsh9c9aytRaDcbLLxDRcQDRx66aXATh28R3
+$ ltcatomicswap --testnet --rpcuser=literpc --rpcpass=litepass auditcontract 63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914537f748b77747bb63e6c54dc72cb964b88d154486704012a5a5ab17576a91416877ea36c0fc5653fcb3d0f1c423c633c95f01e6888ac 0200000001341d2139c84baca7e3ee772e43342bb5adae29ac97f7bf825d1e631ccbbdfdd8000000006a4730440220077a466948ba9b1bcd3810de53eb365a07007b444a253a9a96631ca6ea120fd6022050af903896ae33403e2c92d337bbd5f79789a526245d3a2aa033f1a060f15662012103bd3db3ee6866fa8a340128f9b38a4990786f82c3189c8c16bd828ac1b141c161feffffff02ed63f702000000001976a91441f956d3257b7b8689a51d1938599ba88e2b718788ac809698000000000017a914927cd64dcd1c89bb9a26860e7d6f49ee07f217158700000000
+Contract address:        2N6bnC8JPrdyuDukgvHdt2qQf8Uph6x1T2L
+Contract value:          0.1 LTC
+Recipient address:       mo8T4iqg6mCAxAtZocwocisBnnCj1SjtD7
+Author's refund address: mha5UcKYtC7pi6tpk4dA6YD411E67ARxWx
 
-Secret hash: 29c36b8dd380e0426bdc1d834e74a630bfd5d111
+Secret hash: 753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b04
 
-Locktime: 2017-09-15 13:51:34 +0000 UTC
-Locktime reached in 23h58m10s
+Locktime: 2018-01-13 15:47:13 +0000 UTC
+Locktime reached in 23h56m23s
 ```
 
-Now that both parties have paid into their respective contracts, A may withdraw
-from the Decred contract.  This step involves publishing a transaction which
-reveals the secret to B, allowing B to withdraw from the Bitcoin contract.
+Now that both parties have paid into their respective contracts, Alice may withdraw
+from the Litecoin contract.  This step involves publishing a transaction which
+reveals the secret to Bob, allowing Bob to withdraw from the Viacoin contract.
 
-_Party A runs:_
+_Alice runs:_
 ```
-$ dcratomicswap --testnet redeem 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 010000000137afc6c25b027cb0a1db19a7aac365854796260c4c1077e3e8accae5e4c300e90300000001ffffffff02441455980100000000001976a9144d7c96b6d2360e48a07528332e537d81e068f8ba88ac00e1f50500000000000017a914195fb53333e61a415e9fda21bb991b38b5a4e1c387000000000000000001ffffffffffffffff00000000ffffffff6b483045022100b30971448c93be84c28b98ae159963e9521a84d0c3849821b6e8897d59cf4e6c0220228785cb8d1dba40752e4bd09d99b92b27bc3837b1c547f8b4ee8aba1dfec9310121035a12a086ecd1397f7f68146f4f251253b7c0092e167a1c92ff9e89cf96c68b5f 3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
-Passphrase:
+$ ltcatomicswap --testnet --rpcuser=literpc --rpcpass=litepass redeem 63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914537f748b77747bb63e6c54dc72cb964b88d154486704012a5a5ab17576a91416877ea36c0fc5653fcb3d0f1c423c633c95f01e6888ac 0200000001341d2139c84baca7e3ee772e43342bb5adae29ac97f7bf825d1e631ccbbdfdd8000000006a4730440220077a466948ba9b1bcd3810de53eb365a07007b444a253a9a96631ca6ea120fd6022050af903896ae33403e2c92d337bbd5f79789a526245d3a2aa033f1a060f15662012103bd3db3ee6866fa8a340128f9b38a4990786f82c3189c8c16bd828ac1b141c161feffffff02ed63f702000000001976a91441f956d3257b7b8689a51d1938599ba88e2b718788ac809698000000000017a914927cd64dcd1c89bb9a26860e7d6f49ee07f217158700000000 b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c
+Redeem fee: 0.00067627 LTC (0.00210676 LTC/kB)
 
-Redeem fee: 0.000334 DCR (0.00100300 DCR/kB)
-
-Redeem transaction (53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7):
-000000000118d94f38b8532bfe78bda0d0848a7965bdfbe6e88476896f01318717bc7e1aa50100000000ffffffff01885ef5050000000000001976a9149551ab760ba64b7e573f54d34c53506676e8145888ace6dabb590000000001ffffffffffffffff00000000ffffffffe0483045022100a1a3b37a67f3ed5d6445a0312e825299b54d91a09e0d1b59b5c0a8baa7c0642102201a0d53e9efe7db8dc47210b446fde6425be82761252ff0ebe620efc183788d86012103395a4a3c8c96ef5e5af6fd80ae42486b5d3d860bf3b41dafc415354de8c7ad80203e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16514c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac
+Redeem transaction (d4f28f0c53db2c034b03833069032f2b0cf9f98808b0b4d726ef35e0f26b4ec4):
+02000000019a52c0cc11ec82c9242ed536433ce589e52d6f2ea73f9ba8a129c79c639b929501000000ec483045022100862ed6c63dfdaa4c4d448f7eb46e06e42c7dd211c34378c25c70ac4c777af7bd02200b643f017a2d1b2a132f43312650bb4733d3ecfb0d01cf89829135bed626d864012102a47ce2377f8ce9ca70fa0a1ef84a5ab3c03eac0ebcc180c7adf6b674abc656b020b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c514c5d63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914537f748b77747bb63e6c54dc72cb964b88d154486704012a5a5ab17576a91416877ea36c0fc5653fcb3d0f1c423c633c95f01e6888acffffffff01558e9700000000001976a9142e1aa357602b0dac3e177c3cb04f5b0ac452796288ac012a5a5a
 
 Publish redeem transaction? [y/N] y
-Published redeem transaction (53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7)
+Published redeem transaction (d4f28f0c53db2c034b03833069032f2b0cf9f98808b0b4d726ef35e0f26b4ec4)
 ```
 
-Now that A has withdrawn from the Decred contract and revealed the secret, B
-must extract the secret from this redemption transaction.  B may watch a block
-explorer to see when the Decred contract output was spent and look up the
+Now that Alice has withdrawn from the Litecoin contract and revealed the secret, Bob
+must extract the secret from this redemption transaction.  Bob may watch a block
+explorer to see when the Litecoin contract output was spent and look up the
 redeeming transaction.
 
-_Party B runs:_
+_Bob runs:_
 ```
-$ dcratomicswap --testnet extractsecret 000000000118d94f38b8532bfe78bda0d0848a7965bdfbe6e88476896f01318717bc7e1aa50100000000ffffffff01885ef5050000000000001976a9149551ab760ba64b7e573f54d34c53506676e8145888ace6dabb590000000001ffffffffffffffff00000000ffffffffe0483045022100a1a3b37a67f3ed5d6445a0312e825299b54d91a09e0d1b59b5c0a8baa7c0642102201a0d53e9efe7db8dc47210b446fde6425be82761252ff0ebe620efc183788d86012103395a4a3c8c96ef5e5af6fd80ae42486b5d3d860bf3b41dafc415354de8c7ad80203e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16514c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a9149ee19833332a04d2be97b5c99c970191221c070c6704e6dabb59b17576a914b0ec0640c89cf803b8fdbd6e0183c354f71748c46888ac 29c36b8dd380e0426bdc1d834e74a630bfd5d111
-Secret: 3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
+$ ltcatomicswap --testnet --rpcuser=literpc --rpcpass=litepass extractsecret 02000000019a52c0cc11ec82c9242ed536433ce589e52d6f2ea73f9ba8a129c79c639b929501000000ec483045022100862ed6c63dfdaa4c4d448f7eb46e06e42c7dd211c34378c25c70ac4c777af7bd02200b643f017a2d1b2a132f43312650bb4733d3ecfb0d01cf89829135bed626d864012102a47ce2377f8ce9ca70fa0a1ef84a5ab3c03eac0ebcc180c7adf6b674abc656b020b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c514c5d63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914537f748b77747bb63e6c54dc72cb964b88d154486704012a5a5ab17576a91416877ea36c0fc5653fcb3d0f1c423c633c95f01e6888acffffffff01558e9700000000001976a9142e1aa357602b0dac3e177c3cb04f5b0ac452796288ac012a5a5a 753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b04
+Secret: b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c
+
 ```
 
-With the secret known, B may redeem from A's Bitcoin contract.
+With the secret known, Bob may redeem from Alice's Viacoin contract.
 
-_Party B runs:_
+_Bob runs:_
 ```
-$ btcatomicswap --testnet --rpcuser=user --rpcpass=pass redeem 63a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a914ebcf822c4a2cdb5f6a6b9c4a59b74d66461da5816704d728bd59b17576a91406fb26221375b1cbe2c17c14f1bc2510b9f8f8ff6888ac 010000000267864c7145e43c84d13b514518cfdc7ca5cf2b04764ed2672caa9c8f6338a3e3010000006b483045022100901602e523f25e9659951d186eec7e8b9df9d194e8013fb6d7a05e4eafdbb61602207b66e0179a42c54d4fcfca2b1ccd89d56253cc83724593187713f6befb37866201210288ef714849ce7735b64ed886d056b80d0a384ca299090f684820d31e7682825afeffffff3ac58ce49bcef3d047ea80281659a78cd7ef8537ca2bfce336abdce41450d2d7000000006b483045022100bd1246fc18d26a9cc85c14fb60655da2f2e845af906504b8ba3acbb1b0ebf08202201ec2cd5a0c94e9e6b971ec3198be0ff57e91115342cd98ccece98d8b18294d86012103406e35c37b3b85481db7b7f7807315720dd6486c25e4f3af93d5d5f21e743881feffffff0248957e01000000001976a914c1925e7398d325820bba18726c387e9d80047ef588ac00e1f5050000000017a9142d913627b881255c417787cc255ccad9a33ce48d8700000000 3e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16
-Redeem fee: 0.00000314 BTC (0.00001016 BTC/kB)
+$ viaatomicswap --testnet --rpcuser=viarpc --rpcpass=viapass redeem 63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914427eccead89fd187b4b80e414c94a9cbd798bf1667046c795b5ab17576a914414e19736e7c718cdb532ad5e6f045a4d6c47b5a6888ac 02000000013328bf00e003539fafcaca5fa069280456ceb2ffe63a074963b8db6e85b37fef000000006b4830450221008bb37d82362c23f5f097d37e03268b1cca83f8bc445d4639e426901a6175a1c802203ce6ccc6b88d5cd999987455248e671e708f2b03afa2b8320e204fbec75bce8f0121021bdf64267e7ad297726aa529cf7e61cf8ceb67acbbc9c57ae4df546680788274feffffff0280677c48180900001976a91443306976fdfa61c447055cdb1aea3fe9a3eb3ebd88ac00e1f5050000000017a91470899c4b5ad673c87a8e0b5faf68b092c0c79a818700000000 b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c
+warning: falling back to mempool relay fee policy
+Redeem fee: 0.000326 BTC (0.00101875 VIA/kB)
 
-Redeem transaction (c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0):
-000000000188fee037e8275f7d1e8686886a12131933f481b48902859791d6f1df01496f3401000000e0483045022100f43430384ca5ecfc9ca31dd074d223836cef4801b3644c651c3a30d80fbf63b8022017dae9e7ec6f3f5ee0e0b60d146963ba85d9b31003d7f60852126f2a35492759012103b10e3690bcaf0eae7098ec794666963803bcec5acfbe6a112bc8cdc93797f002203e0b064c97247732a3b345ce7b2a835d928623cb2871c26db4c2539a38e61a16514c5163a61429c36b8dd380e0426bdc1d834e74a630bfd5d1118876a914ebcf822c4a2cdb5f6a6b9c4a59b74d66461da5816704d728bd59b17576a91406fb26221375b1cbe2c17c14f1bc2510b9f8f8ff6888acffffffff01c6dff505000000001976a914e1fce397007bad3ce051f0b1c3c7587f016cd76a88acd728bd59
+Redeem transaction (fecb2de3d6fd9006a3124f1b7fa723d401ff421c0bae0c081158639994b6c8cd):
+0200000001330d6ef7fea7b37651a3b8c28226f6492d3525650e98afa2dce2dff4c68f669d01000000eb47304402203d18ffad8f72b0506df8270924ab90e76bc984d860a82824e5988a11e39216ff02204caedaf92a948734914aeb6975544b28314de36a29fc26d4d9e594f216ee3901012102d70487eddedf7dd6bbd14bf3ac938ac45714fe0408f3c5a50ec9759d4d5f2bd420b62b3b1c27ada27ae9939cb3885b29aa5a0ca3031b2b81fc3730ae6f36e2a74c514c5d63a820753a983643fcd03293336b0d476adffd0a5a26d38b7e172cabe2b6c127ff2b048876a914427eccead89fd187b4b80e414c94a9cbd798bf1667046c795b5ab17576a914414e19736e7c718cdb532ad5e6f045a4d6c47b5a6888acffffffff01a861f505000000001976a914f2945cf18bf058003eb659f75bbc2eae1d287bb088ac6c795b5a
 
 Publish redeem transaction? [y/N] y
-Published redeem transaction (c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0)
+Published redeem transaction (fecb2de3d6fd9006a3124f1b7fa723d401ff421c0bae0c081158639994b6c8cd)
 ```
 
 The cross-chain atomic swap is now completed and successful.  This example was
-performed on the public Bitcoin and Decred testnet blockchains.  For reference,
+performed on the public Viacoin and Litecoin testnet blockchains.  For reference,
 here are the four transactions involved:
 
 | Description | Transaction |
 | - | - |
-| Bitcoin contract created by A | [346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88](https://www.blocktrail.com/tBTC/tx/346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88) |
-| Decred contract created by B | [a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918](https://testnet.decred.org/tx/a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918) |
-| A's Decred redemption | [53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7](https://testnet.decred.org/tx/53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7) |
-| B's Bitcoin redemption | [c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0](https://www.blocktrail.com/tBTC/tx/c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0) |
+| Viacoin contract created by A | [9d668fc6f4dfe2dca2af980e6525352d49f62682c2b8a35176b3a7fef76e0d33] |
+| Litecoin contract created by B | [95929b639cc729a1a89b3fa72e6f2de589e53c4336d52e24c982ec11ccc0529a] |
+| A's Litecoin redemption | [fecb2de3d6fd9006a3124f1b7fa723d401ff421c0bae0c081158639994b6c8cd] |
+| B's Viacoin redemption | [c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0] |
 
 If at any point either party attempts to fraud (e.g. creating an invalid
 contract, not revealing the secret and refunding, etc.) both parties have the
@@ -393,28 +393,13 @@ Another method of discovering these transactions is to use a public blockchain
 explorer.  Not all explorers expose this info through the main user interface so
 the API endpoints may need to be used instead.
 
-For Insight-based block explorers, such as the Bitcoin block explorer on
+For Insight-based block explorers, such as the Viacoin block explorer on
 [test-]insight.bitpay.com, the Litecoin block explorer on
-{insight,testnet}.litecore.io, and the Decred block explorer on
-{mainnet,testnet}.decred.org, the API endpoint `/api/rawtx/<txhash>` can be used
+{insight,testnet}.litecore.io, and the Litecoin block explorer on
+{mainnet,testnet}.viacoin.org, the API endpoint `/api/rawtx/<txhash>` can be used
 to return a JSON object containing the raw transaction.  For example, here are
 links to the four raw transactions published in the example:
 
-| Description | Link to raw transaction |
-| - | - |
-| Bitcoin contract created by A | https://test-insight.bitpay.com/api/rawtx/346f4901dff1d69197850289b481f4331913126a8886861e7d5f27e837e0fe88 |
-| Decred contract created by B | https://testnet.decred.org/api/rawtx/a51a7ebc178731016f897684e8e6fbbd65798a84d0a0bd78fe2b53b8384fd918 |
-| A's Decred redemption | https://testnet.decred.org/api/rawtx/53c2e8bafb8fe36d54bbb1884141a39ea4da83db30bdf3c98ef420cdb332b0e7 |
-| B's Bitcoin redemption | https://test-insight.bitpay.com/api/rawtx/c49e6fd0057b601dbb8856ad7b3fcb45df626696772f6901482b08df0333e5a0 |
-
-## First mainnet DCR-LTC atomic swap
-
-| Description | Link to raw transaction |
-| - | - |
-| Decred contract created by A | [fdd72f5841414a9c8b4a188a98a4d484df98f84e1c120e1ed59a66e51e8ae90c](https://mainnet.decred.org/tx/fdd72f5841414a9c8b4a188a98a4d484df98f84e1c120e1ed59a66e51e8ae90c) |
-| Litecoin contract created by B | [550d1b2851f6f104e380aa3c2810ac272f8b6918140547c9717a78b1f4ff3469](https://insight.litecore.io/tx/550d1b2851f6f104e380aa3c2810ac272f8b6918140547c9717a78b1f4ff3469) |
-| A's Litecoin redemption | [6c27cffab8a86f1b3be1ebe7acfbbbdcb82542c5cfe7880fcca60eab36747037](https://insight.litecore.io/tx/6c27cffab8a86f1b3be1ebe7acfbbbdcb82542c5cfe7880fcca60eab36747037) |
-| B's Decred redemption | [49245425967b7e39c1eb27d261c7fe972675cccacff19ae9cc21f434ccddd986](https://mainnet.decred.org/tx/49245425967b7e39c1eb27d261c7fe972675cccacff19ae9cc21f434ccddd986) |
 ## License
 
 These tools are licensed under the [copyfree](http://copyfree.org) ISC License.
